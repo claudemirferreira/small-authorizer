@@ -7,4 +7,5 @@ public interface CardGateway {
     CardDomain save(CardDomain cardDomain);
     CardDomain findCardByNumber(String number);
 
+
 }

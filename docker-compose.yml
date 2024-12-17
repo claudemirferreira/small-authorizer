@@ -1,19 +1,38 @@
-version: '3.9'
-
 services:
-  postgres:
-    image: postgres:15      # Especifique a versão do PostgreSQL
-    container_name: postgres_container
-    restart: always          # Reinicia o contêiner automaticamente
-    environment:
-      POSTGRES_USER: root   # Usuário do PostgreSQL
-      POSTGRES_PASSWORD: root   # Senha do PostgreSQL
-      POSTGRES_DB: account      # Banco de dados inicial
+  autorizador-api:
+    image: 'openjdk:21'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: autorizador-api
     ports:
-      - "5432:5432"          # Mapeia a porta local para a porta do contêiner
-    volumes:
-      - postgres_data:/var/lib/postgresql/data  # Volume para persistência de dados
+      - "8080:8080"
+    depends_on:
+      - mysqldb
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/miniautorizador
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+      - PROFILE=dev
+    entrypoint: /wait-for-it.sh db:3306 -t 5 -- java -jar /opt/app.jar
+    networks:
+      - spring
 
-volumes:
-  postgres_data:
-    driver: local
+  mysqldb:
+    image: mysql:5.7
+    hostname: mysql
+    container_name: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: miniautorizador
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    networks:
+      - spring
+
+networks:
+  spring:
+    driver: bridge

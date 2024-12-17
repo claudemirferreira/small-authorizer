@@ -1,6 +1,5 @@
 package com.fcamara.smallauthorizer.infrastructure.persistence.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -24,7 +23,7 @@ public class CardEntity extends AbstractEntity {
     @Column(name = "balance", columnDefinition = "decimal", precision = 15, scale = 2)
     private BigDecimal balance;
 
-    @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "card")
     private List<TransactionEntity> transactions;
 
 }
