@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Card extends AbstractEntity {
+public class CardEntity extends AbstractEntity {
 
     private String password;
 
@@ -25,6 +25,6 @@ public class Card extends AbstractEntity {
     private BigDecimal balance;
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Transaction> transactions;
+    private List<TransactionEntity> transactions;
 
 }
