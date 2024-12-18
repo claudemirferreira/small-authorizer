@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "transaction")
 @Entity
 public class TransactionEntity extends AbstractEntity {
 

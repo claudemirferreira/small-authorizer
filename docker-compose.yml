@@ -14,9 +14,10 @@ services:
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=password
       - PROFILE=dev
-    entrypoint: /wait-for-it.sh db:3306 -t 5 -- java -jar /opt/app.jar
+    entrypoint: /wait-for-it.sh mysqldb:3306 -t 5 -- java -jar /opt/app.jar
     networks:
       - spring
+
 
   mysqldb:
     image: mysql:5.7
