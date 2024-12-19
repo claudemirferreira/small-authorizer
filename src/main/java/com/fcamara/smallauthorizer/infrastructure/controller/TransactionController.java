@@ -4,7 +4,6 @@ import com.fcamara.smallauthorizer.application.usecases.CreateTransactionUsecase
 import com.fcamara.smallauthorizer.infrastructure.controller.dto.TransactionResquestDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,11 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 
 @RestController
-@RequestMapping(value = "/transacoes")
+@RequestMapping(value = "/transaction")
 @RequiredArgsConstructor
 public class TransactionController {
 
-    private final ModelMapper modelMapper;
     private final CreateTransactionUsecase createTransactionUsecase;
 
     @PostMapping

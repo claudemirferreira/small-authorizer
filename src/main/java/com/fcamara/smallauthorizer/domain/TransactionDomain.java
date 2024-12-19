@@ -15,13 +15,9 @@ import java.util.UUID;
 @NoArgsConstructor
 public class TransactionDomain {
 
-
     private UUID id;
-
     private LocalDateTime lastModifiedAt;
-
     private BigDecimal value;
-
     private CardDomain cardDomain;
 
     public TransactionDomain(final CardDomain cardDomain, final BigDecimal value, final LocalDateTime time) {

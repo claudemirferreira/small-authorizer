@@ -2,6 +2,7 @@ package com.fcamara.smallauthorizer.infrastructure.gateways;
 
 import com.fcamara.smallauthorizer.application.gateways.CardGateway;
 import com.fcamara.smallauthorizer.domain.CardDomain;
+import com.fcamara.smallauthorizer.infrastructure.exception.CardNotFoundException;
 import com.fcamara.smallauthorizer.infrastructure.persistence.entity.CardEntity;
 import com.fcamara.smallauthorizer.infrastructure.persistence.repository.CardRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class CardRepositoryGateway implements CardGateway {
 
     @Override
     public CardDomain findCardByNumber(String number) {
-        var entity = cardRepository.findByNumber(number);
+        var entity = cardRepository.findByNumber(number).orElseThrow(() -> new CardNotFoundException("..."));
         return modelMapper.map(entity, CardDomain.class);
     }
 }
