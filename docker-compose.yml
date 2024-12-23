@@ -1,42 +1,29 @@
 services:
-  autorizador-api:
-    image: 'openjdk:21'
+  app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: autorizador-api
     ports:
       - "8080:8080"
     depends_on:
-      - mysqldb
+      db:
+        condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/miniautorizador
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/account  # Banco de dados 'account'
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=password
-      - PROFILE=dev
-    entrypoint: [ "/bin/sh", "-c", "/wait-for-it.sh mysqldb:3306 -t 5 -- java -jar /opt/app.jar" ]
-    volumes:
-      - ./wait-for-it.sh:/wait-for-it.sh:ro
-    networks:
-      - spring
+      - SPRING_DATASOURCE_PASSWORD=root
 
-
-  mysqldb:
+  db:
     image: mysql:8.0
-    platform: linux/amd64
-    hostname: mysql
-    container_name: mysql
+    container_name: myapp-db
     restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: account  # Alterado para 'account'
     ports:
       - "3306:3306"
-    environment:
-      MYSQL_DATABASE: miniautorizador
-      MYSQL_ROOT_USER: root
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-    networks:
-      - spring
-
-networks:
-  spring:
-    driver: bridge
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
