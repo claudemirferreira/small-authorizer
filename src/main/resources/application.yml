@@ -6,13 +6,10 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/miniautorizador
+    url: jdbc:mysql://localhost:3306/account
     username: root
-    password: password
+    password: root
 
-
-  flyway:
-    enabled: true
   jpa:
     show-sql: true
     database: mysql
