@@ -7,7 +7,7 @@
 ## Steps
 - 1 access the project root the app and execute the command below:
 ```
-docker-compose up -d
+docker-compose up  --build
 ```
 
 - 2 Access the link below:
