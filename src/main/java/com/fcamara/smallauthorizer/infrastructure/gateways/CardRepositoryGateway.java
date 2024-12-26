@@ -27,4 +27,9 @@ public class CardRepositoryGateway implements CardGateway {
         var entity = cardRepository.findByNumber(number).orElseThrow(() -> new CardNotFoundException("..."));
         return modelMapper.map(entity, CardDomain.class);
     }
+
+    @Override
+    public boolean accountExist(String number) {
+        return cardRepository.findByNumber(number).isPresent();
+    }
 }

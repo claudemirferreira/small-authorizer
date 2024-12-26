@@ -5,15 +5,15 @@ import com.fcamara.smallauthorizer.domain.CardDomain;
 import com.fcamara.smallauthorizer.infrastructure.exception.CardAlreadyExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
+
+import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class CreateCardUseCaseImplTest {
 
     @Mock
@@ -22,18 +22,21 @@ class CreateCardUseCaseImplTest {
     @InjectMocks
     private CreateCardUseCaseImpl createCardUseCase;
 
-    private CardDomain cardDomain;
-
     @BeforeEach
-    public void setUp() {
-        cardDomain = new CardDomain(); // Inicialize conforme necessário
-        cardDomain.setNumber("1234567890123456"); // Defina um número de cartão
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testExecute_CardDoesNotExist() {
+    void execute_ShouldCreateCard_WhenCardDoesNotExist() {
         // Arrange
-        when(cardGateway.findCardByNumber(cardDomain.getNumber())).thenReturn(null);
+        CardDomain cardDomain = CardDomain
+                .builder()
+                .balance(new BigDecimal("1000"))
+                .number("1")
+                .password("1")
+                .build();
+        when(cardGateway.accountExist(cardDomain.getNumber())).thenReturn(false);
         when(cardGateway.save(cardDomain)).thenReturn(cardDomain);
 
         // Act
@@ -42,22 +45,24 @@ class CreateCardUseCaseImplTest {
         // Assert
         assertNotNull(result);
         assertEquals(cardDomain, result);
-        verify(cardGateway).findCardByNumber(cardDomain.getNumber());
+        verify(cardGateway).accountExist(cardDomain.getNumber());
         verify(cardGateway).save(cardDomain);
     }
 
     @Test
-    void testExecute_CardAlreadyExists() {
+    void execute_ShouldThrowException_WhenCardAlreadyExists() {
         // Arrange
-        when(cardGateway.findCardByNumber(cardDomain.getNumber())).thenReturn(cardDomain);
+        CardDomain cardDomain = CardDomain
+                .builder()
+                .balance(new BigDecimal("1000"))
+                .number("1")
+                .password("1")
+                .build();
+        when(cardGateway.accountExist(cardDomain.getNumber())).thenReturn(true);
 
         // Act & Assert
-        CardAlreadyExistsException exception = assertThrows(CardAlreadyExistsException.class, () -> {
-            createCardUseCase.execute(cardDomain);
-        });
-
-        assertEquals("", exception.getReason());
-        verify(cardGateway).findCardByNumber(cardDomain.getNumber());
-        verify(cardGateway, never()).save(any());
+        assertThrows(CardAlreadyExistsException.class, () -> createCardUseCase.execute(cardDomain));
+        verify(cardGateway).accountExist(cardDomain.getNumber());
+        verify(cardGateway, never()).save(any(CardDomain.class));
     }
 }

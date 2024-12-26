@@ -4,6 +4,7 @@ import com.fcamara.smallauthorizer.application.usecases.CreateCardUsecase;
 import com.fcamara.smallauthorizer.application.usecases.FindCardByNumberUsecase;
 import com.fcamara.smallauthorizer.domain.CardDomain;
 import com.fcamara.smallauthorizer.infrastructure.controller.dto.CardRequestDTO;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
