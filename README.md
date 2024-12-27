@@ -17,7 +17,7 @@ docker-compose up  --build
 - 3 create first account
 ```  
 curl -X 'POST' \
-'http://localhost:8080/accounts' \
+'http://localhost:8080/cartoes' \
 -H 'accept: application/json' \
 -H 'Content-Type: application/json' \
 -d '{
@@ -30,7 +30,7 @@ curl -X 'POST' \
 
 ```  
 curl -X 'POST' \
-'http://localhost:8080/accounts' \
+'http://localhost:8080/cartoes' \
  -H 'accept: application/json' \
  -H 'Content-Type: application/json' \
  -d '{
@@ -57,7 +57,7 @@ curl -X 'POST' \
   curl -X 'PUT' \
 
 ``` 
-  'http://localhost:8080/transactions/transfer-funds' \
+  'http://localhost:8080/transacoes' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -66,26 +66,12 @@ curl -X 'POST' \
   "amount": 50,
   "description": "TED"
   }'
-``` 
-
-- 7 make a withdrawal from one of the accounts
-
 ```
-  curl -X 'PUT' \
-  'http://localhost:8080/transactions/withdraw-funds' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "accountNumber": "2",
-  "amount": 20,
-  "description": "Marcos"
-  }'
-``` 
 
-- 8 check account balance
+- 7 check account balance
 
 ``` 
   curl -X 'GET' \
-  'http://localhost:8080/accounts/1/balance' \
+  'http://localhost:8080/cartoes/{numeroCartao}' \
   -H 'accept: application/json'
 ``` 

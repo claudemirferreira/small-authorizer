@@ -7,9 +7,6 @@ import com.fcamara.smallauthorizer.infrastructure.exception.CardAlreadyExistsExc
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-
-
 @Service
 @RequiredArgsConstructor
 public class CreateCardUseCaseImpl implements CreateCardUsecase {
@@ -23,8 +20,7 @@ public class CreateCardUseCaseImpl implements CreateCardUsecase {
     }
 
     private void validCardAlreadyExists(String cardNumber) {
-        var card = cardGateway.findCardByNumber(cardNumber);
-        if(Objects.nonNull(card)){
+        if(cardGateway.accountExist(cardNumber)){
             throw new CardAlreadyExistsException("");
         }
 

@@ -17,11 +17,15 @@ import java.util.Optional;
 
 
 @Service
-@RequiredArgsConstructor
 public class CreateTransactionUseCaseImpl implements CreateTransactionUsecase {
 
     private final CardGateway cardGateway;
     private final TransactionGateway transactionGateway;
+
+    public CreateTransactionUseCaseImpl(CardGateway cardGateway, TransactionGateway transactionGateway) {
+        this.cardGateway = cardGateway;
+        this.transactionGateway = transactionGateway;
+    }
 
     @Override
     public TransactionDomain execute(final String cardNumber, final BigDecimal transactionAmount, final String password) {
