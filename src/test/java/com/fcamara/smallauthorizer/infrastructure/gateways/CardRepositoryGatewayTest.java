@@ -13,84 +13,134 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
 import java.math.BigDecimal;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class CardRepositoryGatewayTest {
 
-    @InjectMocks
-    private CardRepositoryGateway cardRepositoryGateway;
     @Mock
     private CardRepository cardRepository;
+
     @Mock
     private ModelMapper modelMapper;
+
+    @InjectMocks
+    private CardRepositoryGateway cardRepositoryGateway;
+
     private CardDomain cardDomain;
     private CardEntity cardEntity;
 
     @BeforeEach
     void setUp() {
-        // Criação do objeto CardDomain
-        cardDomain = CardDomain.builder()
-                .number("123456789")
+        // Set up test data
+        cardDomain = CardDomain
+                .builder()
+                .id(UUID.randomUUID())
                 .balance(BigDecimal.valueOf(1000))
-                .password("1234")
+                .password("password")
+                .lastModifiedAt(LocalDateTime.now())
                 .build();
-
-        // Criação da entidade CardEntity correspondente
-        cardEntity = CardEntity.builder()
-                .number("123456789")
+                //new CardDomain("123456", "password", 1000.00);
+        cardEntity = CardEntity
+                .builder()
                 .balance(BigDecimal.valueOf(1000))
-                .password("1234")
+                .number("1")
+                .password("password")
+                .transactions(List.of())
                 .build();
     }
 
     @Test
-    void save_ShouldSaveCardCorrectly() {
-        // Given: Mockando o comportamento do ModelMapper e do cardRepository
-        when(modelMapper.map(cardDomain, CardEntity.class)).thenReturn(cardEntity);
-        when(cardRepository.save(cardEntity)).thenReturn(cardEntity);
-        when(modelMapper.map(cardEntity, CardDomain.class)).thenReturn(cardDomain);
+    void save_shouldReturnSavedCard() {
+        // Arrange: Mock the repository and model mapper behavior
+        when(cardRepository.save(any(CardEntity.class))).thenReturn(cardEntity);
+        when(modelMapper.map(any(CardDomain.class), eq(CardEntity.class))).thenReturn(cardEntity);
+        when(modelMapper.map(any(CardEntity.class), eq(CardDomain.class))).thenReturn(cardDomain);
 
-        // When: Chamando o método save
-        CardDomain savedCard = cardRepositoryGateway.save(cardDomain);
+        // Act: Call the save method
+        CardDomain result = cardRepositoryGateway.save(cardDomain);
 
-        // Then: Verificando se o método save foi chamado corretamente
-        verify(cardRepository, times(1)).save(cardEntity);
-        assertNotNull(savedCard);
-        assertEquals(cardDomain.getNumber(), savedCard.getNumber());
-        assertEquals(cardDomain.getBalance(), savedCard.getBalance());
+        // Assert: Verify that the result is as expected
+        assertNotNull(result);
+        assertEquals(cardDomain.getNumber(), result.getNumber());
+        assertEquals(cardDomain.getPassword(), result.getPassword());
+        assertEquals(cardDomain.getBalance(), result.getBalance());
+
+        // Verify interactions with mocks
+        verify(cardRepository, times(1)).save(any(CardEntity.class));
+        verify(modelMapper, times(1)).map(any(CardDomain.class), eq(CardEntity.class));
+        verify(modelMapper, times(1)).map(any(CardEntity.class), eq(CardDomain.class));
     }
 
     @Test
-    void findCardByNumber_ShouldReturnCardDomain_WhenCardExists() {
-        // Given: Mockando o comportamento do ModelMapper e do cardRepository
-        when(cardRepository.findByNumber("123456789")).thenReturn(Optional.ofNullable(cardEntity));
-        when(modelMapper.map(cardEntity, CardDomain.class)).thenReturn(cardDomain);
+    void findCardByNumber_shouldReturnCardDomain() {
+        // Arrange: Mock the repository and model mapper behavior
+        when(cardRepository.findByNumber("123456")).thenReturn(java.util.Optional.of(cardEntity));
+        when(modelMapper.map(any(CardEntity.class), eq(CardDomain.class))).thenReturn(cardDomain);
 
-        // When: Chamando o método findCardByNumber
-        CardDomain foundCard = cardRepositoryGateway.findCardByNumber("123456789");
+        // Act: Call the findCardByNumber method
+        CardDomain result = cardRepositoryGateway.findCardByNumber("123456");
 
-        // Then: Verificando se o método findByNumber foi chamado corretamente
-        verify(cardRepository, times(1)).findByNumber("123456789");
-        assertNotNull(foundCard);
-        assertEquals(cardDomain.getNumber(), foundCard.getNumber());
-        assertEquals(cardDomain.getBalance(), foundCard.getBalance());
+        // Assert: Verify that the result is as expected
+        assertNotNull(result);
+        assertEquals(cardDomain.getNumber(), result.getNumber());
+        assertEquals(cardDomain.getPassword(), result.getPassword());
+        assertEquals(cardDomain.getBalance(), result.getBalance());
+
+        // Verify interactions with mocks
+        verify(cardRepository, times(1)).findByNumber("123456");
+        verify(modelMapper, times(1)).map(any(CardEntity.class), eq(CardDomain.class));
     }
 
-
-
     @Test
-    public void testFindCardByNumber_CardNotFound() {
-        when(cardRepository.findByNumber("1234567890123456")).thenReturn(Optional.empty());
+    void findCardByNumber_shouldThrowCardNotFoundException_whenCardNotFound() {
+        // Arrange: Mock the repository to return empty
+        when(cardRepository.findByNumber("123456")).thenReturn(java.util.Optional.empty());
+
+        // Act & Assert: Verify that the exception is thrown
         CardNotFoundException exception = assertThrows(CardNotFoundException.class, () -> {
-            cardRepositoryGateway.findCardByNumber("1234567890123456");
+            cardRepositoryGateway.findCardByNumber("123456");
         });
-        assertEquals("...", exception.getReason());
-        verify(cardRepository).findByNumber("1234567890123456");
-        verify(modelMapper, never()).map(any(), any());
+
+        assertEquals("...", exception.getMessage());
+
+        // Verify interactions with mocks
+        verify(cardRepository, times(1)).findByNumber("123456");
     }
 
+    @Test
+    void accountExist_shouldReturnTrueWhenCardExists() {
+        // Arrange: Mock the repository behavior
+        when(cardRepository.findByNumber("123456")).thenReturn(java.util.Optional.of(cardEntity));
+
+        // Act: Call the accountExist method
+        boolean result = cardRepositoryGateway.accountExist("123456");
+
+        // Assert: Verify that the result is true
+        assertTrue(result);
+
+        // Verify interactions with mocks
+        verify(cardRepository, times(1)).findByNumber("123456");
+    }
+
+    @Test
+    void accountExist_shouldReturnFalseWhenCardDoesNotExist() {
+        // Arrange: Mock the repository to return empty
+        when(cardRepository.findByNumber("123456")).thenReturn(java.util.Optional.empty());
+
+        // Act: Call the accountExist method
+        boolean result = cardRepositoryGateway.accountExist("123456");
+
+        // Assert: Verify that the result is false
+        assertFalse(result);
+
+        // Verify interactions with mocks
+        verify(cardRepository, times(1)).findByNumber("123456");
+    }
 }
