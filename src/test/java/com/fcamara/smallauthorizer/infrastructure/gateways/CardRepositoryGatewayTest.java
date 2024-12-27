@@ -108,7 +108,7 @@ class CardRepositoryGatewayTest {
             cardRepositoryGateway.findCardByNumber("123456");
         });
 
-        assertEquals("...", exception.getMessage());
+        assertEquals("...", exception.getReason());
 
         // Verify interactions with mocks
         verify(cardRepository, times(1)).findByNumber("123456");
